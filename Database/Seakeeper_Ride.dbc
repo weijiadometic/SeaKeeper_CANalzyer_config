@@ -1,0 +1,249 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_:
+VAL_TABLE_ fault_page 0 "no fault" ;
+VAL_TABLE_ work_status_feedback_64523 50 "calibration" 49 "calibration" 16 "normal work" ;
+VAL_TABLE_ reserved_69632 255 "default" ;
+VAL_TABLE_ config_command_69632 16857120 "starb controller reboot" 16856337 "port controller reboot" ;
+VAL_TABLE_ abs_pos_gain_64512 3 "default" ;
+VAL_TABLE_ cal_readiness_64512 8 "cal ready" ;
+VAL_TABLE_ calibration_command_64512_B1 80 "calibration request starb" 32 "calibration request port" 0 "normal" ;
+VAL_TABLE_ reserved_64612_B6 255 "default (MFD)" 248 "default (keypad)" ;
+VAL_TABLE_ reserved_64612_B5 255 "default (MFD)" 3 "default (keypad)" ;
+VAL_TABLE_ reserved_64612_B4 255 "default (MFD)" 0 "default (keypad)" ;
+VAL_TABLE_ reserved_64612_B2 255 "default (MFD)" 0 "default (keypad)" ;
+VAL_TABLE_ move_direction_64612 255 "Negative (MFD)" 253 "Positive (MFD)" 1 "Positive (keypad)" 0 "Negative (keypad)" ;
+VAL_TABLE_ mode_toggle_64612_B0 255 "Default (MFD)" 253 "Mode Toggle (MFD)" 1 "Mode Toggle (Keypad)" 0 "Default (Keypad)" ;
+VAL_TABLE_ work_mode 35 "manual mode" 18 "calibration mode" 17 "start up" ;
+VAL_TABLE_ SteeringStateFbk 5 "Paddle Mode" 4 "Fail" 3 "Inspect" 2 "Purge" 1 "Calibration" 0 "Normal" ;
+VAL_TABLE_ CalStatus 7 "N/A" 4 "Freeze" 3 "Reserved" 2 "Stbd Cal" 1 "Port Cal" 0 "Move" ;
+VAL_TABLE_ SteeringStateRqst 12 "Center Cylinders" 5 "Fail" 4 "Inspect" 3 "Purge Stbd" 2 "Purge Port" 1 "Calibrate" 0 "Normal" ;
+
+
+BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
+ SG_ no_effect_32bits : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_94 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_93 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_92 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_91 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_90 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_85 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ pos_command_starb : 0|1@1+ (0.0934,-24.6555) [0|0] "deg" Vector__XXX
+ SG_ pos_command_port : 0|1@1+ (0.0934,-24.6555) [0|0] "deg" Vector__XXX
+ SG_ Trim_Angle_combine : 0|40@0- (1E-009,240) [0|0] "" Vector__XXX
+ SG_ TrimAngle_Rough : 0|8@1- (2.5,0) [0|0] "" Vector__XXX
+ SG_ Trim_Angle : 0|16@0- (0.0002,0) [0|0] "" Vector__XXX
+ SG_ B_6_7 : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B_3_4 : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B_5_6_7_big : 0|24@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ B_2_3_4_big : 0|24@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ B_5_6_big : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ B_2_3_big : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ B7 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B6 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B5 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B4 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B3 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B2 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B1 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B0 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B0 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B6 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B3 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B3 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B2 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B1 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B0 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B0_M : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B0_L : 0|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B_2_3_big : 0|16@0+ (1,0) [0|0] "" Vector__XXX
+ SG_ PosFed_pot : 0|12@1+ (0.212,-381.6) [0|0] "deg" Vector__XXX
+ SG_ B7 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B6 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B5 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B4 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B3 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B2 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B1 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B0 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B_1_2 : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B_0_1_2 : 0|24@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B_0_1 : 0|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B6 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B5 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B7 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ no_effect_8bits : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2147548180 productInfo2_64532: 8 Vector__XXX
+
+BO_ 2147548172 productInfo1_64524: 8 Vector__XXX
+
+BO_ 2147548171 WkStFed_64523: 8 Vector__XXX
+ SG_ sea_hours : 48|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ run_hours : 32|16@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ fault_page_3 : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ fault_page_2 : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ fault_page_1 : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ work_status_feedback : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2147548260 UserCmd_64612: 8 Vector__XXX
+ SG_ reserved : 56|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ move_direction_starb : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ move_direction_port : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ mode_toggle : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2147553536 AuthenResp_69888: 8 Vector__XXX
+ SG_ B7 : 56|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B6 : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B5 : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B4 : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B3 : 24|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B2 : 16|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B1 : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ B0 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2147553280 CfgCmd_69632: 8 Vector__XXX
+ SG_ reserved : 56|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ config_command : 0|32@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2147548160 WkCmd_64512: 8 Vector__XXX
+ SG_ pos_reference_port : 32|8@1+ (-1.514,169.6) [0|0] "deg" Vector__XXX
+ SG_ work_mode : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cal_readiness_starb : 52|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ abs_pos_gain_starb : 49|3@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ cal_readiness_port : 28|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ abs_pos_gain_port : 25|3@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ pos_command_starb : 40|9@1+ (0.0934,-24.6555) [0|0] "deg" Vector__XXX
+ SG_ pos_reference_starb : 56|8@1+ (-1.514,169.6) [0|0] "deg" Vector__XXX
+ SG_ pos_command_port : 16|9@1+ (0.0934,-24.6555) [0|0] "deg" Vector__XXX
+ SG_ calibration_command : 8|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2147548215 Roll_Pitch_Ang_64567: 8 Vector__XXX
+ SG_ RollAng_pot : 0|16@1+ (0.005,-160) [0|0] "deg" Vector__XXX
+ SG_ PitchAng_pot : 16|16@1+ (0.005,-160) [0|0] "deg" Vector__XXX
+ SG_ reserved : 56|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2147548210 Roll_Pitch_Ang_64562: 8 Vector__XXX
+ SG_ reserved : 56|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 48|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 40|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ reserved : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ RollAng_pot : 0|16@1+ (0.005,-160) [0|0] "deg" Vector__XXX
+ SG_ PitchAng_pot : 16|16@1+ (0.005,-160) [0|0] "deg" Vector__XXX
+
+BO_ 2147548170 WkFed_64522: 8 Vector__XXX
+ SG_ reserved : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ pos_reference_port : 8|8@1+ (-1.514,169.6) [0|0] "deg" Vector__XXX
+ SG_ reserve_4bits : 28|4@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ abs_pos_gain_port : 25|3@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ temperature : 56|8@1+ (1,40) [0|0] "" Vector__XXX
+ SG_ voltage : 48|8@1+ (0.2,0) [0|0] "" Vector__XXX
+ SG_ current : 40|8@1+ (0.05,0) [0|0] "" Vector__XXX
+ SG_ speed_feedback : 32|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ position_feedback : 16|9@1+ (0.0936,-24.7101) [0|0] "deg" Vector__XXX
+
+
+
+CM_ BO_ 3221225472 "This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.";
+CM_ SG_ 3221225472 pos_command_starb "Byte6 Bit0";
+CM_ SG_ 3221225472 pos_command_port "Byte 3 Bit 0
+";
+CM_ SG_ 2147548171 work_status_feedback "B0 ";
+CM_ SG_ 2147553280 reserved "B7 69632B6 69632B5 69632B4 69632";
+CM_ SG_ 2147553280 config_command "Bytes 0-3 (little) config command 69632";
+CM_ SG_ 2147548160 pos_reference_port "Byte 4
+";
+CM_ SG_ 2147548160 work_mode "Byte 0
+";
+CM_ SG_ 2147548160 cal_readiness_starb "Byte 6 Bit 4-7
+";
+CM_ SG_ 2147548160 abs_pos_gain_starb "Byte 6 Bit 1-3
+";
+CM_ SG_ 2147548160 cal_readiness_port "Byte 3 Bit 4-7
+";
+CM_ SG_ 2147548160 abs_pos_gain_port "Byte 3 Bit 1-3";
+CM_ SG_ 2147548160 pos_command_starb "Byte 5 and bit 0 of Byte 6";
+CM_ SG_ 2147548160 pos_reference_starb "Byte 4
+";
+CM_ SG_ 2147548160 pos_command_port "Byte 2 and bit 0 of Byte 3
+";
+CM_ SG_ 2147548160 calibration_command "Byte 1
+";
+CM_ SG_ 2147548215 RollAng_pot "B0-B1 roll angle 64567";
+CM_ SG_ 2147548215 PitchAng_pot "B2-B3 pitch angle 64567
+";
+CM_ SG_ 2147548170 pos_reference_port "Byte 4
+";
+CM_ SG_ 2147548170 abs_pos_gain_port "Byte 3 Bit 1-3";
+CM_ SG_ 2147548170 temperature "64522";
+CM_ SG_ 2147548170 voltage "64522";
+CM_ SG_ 2147548170 current "64522";
+CM_ SG_ 2147548170 speed_feedback "64522
+";
+CM_ SG_ 2147548170 position_feedback "64522
+";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "IsNMEA" INT 0 1;
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "IsNMEA" 1;
+VAL_ 2147548171 fault_page_3 0 "no fault" ;
+VAL_ 2147548171 fault_page_2 0 "no fault" ;
+VAL_ 2147548171 fault_page_1 0 "no fault" ;
+VAL_ 2147548171 work_status_feedback 50 "calibration" 49 "calibration" 16 "normal work" ;
+VAL_ 2147548260 reserved 255 "default (MFD)" 0 "default (keypad)" ;
+VAL_ 2147548260 move_direction_starb 255 "Negative (MFD)" 253 "Positive (MFD)" 1 "Positive (keypad)" 0 "Negative (keypad)" ;
+VAL_ 2147548260 move_direction_port 255 "Negative (MFD)" 253 "Positive (MFD)" 1 "Positive (keypad)" 0 "Negative (keypad)" ;
+VAL_ 2147548260 mode_toggle 255 "Default (MFD)" 253 "Mode Toggle (MFD)" 1 "Mode Toggle (Keypad)" 0 "Default (Keypad)" ;
+VAL_ 2147553280 reserved 255 "default" ;
+VAL_ 2147553280 config_command 16857120 "starb controller reboot" 16856337 "port controller reboot" ;
+VAL_ 2147548160 work_mode 51 "auto mode" 35 "manual mode" 18 "calibration mode" 17 "start up" ;
+VAL_ 2147548160 cal_readiness_starb 8 "cal ready" ;
+VAL_ 2147548160 abs_pos_gain_starb 3 "default" ;
+VAL_ 2147548160 cal_readiness_port 8 "cal ready" ;
+VAL_ 2147548160 abs_pos_gain_port 3 "default" ;
+VAL_ 2147548160 calibration_command 80 "calibration request starb" 32 "calibration request port" 0 "normal" ;
+VAL_ 2147548170 abs_pos_gain_port 3 "default" ;
+

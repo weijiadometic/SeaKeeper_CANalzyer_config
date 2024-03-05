@@ -1,0 +1,606 @@
+/*@!Encoding:1252*/
+includes
+{
+  
+}
+
+variables
+{
+  // timer
+  msTimer timer_10ms;    // 10ms timer
+  byte counter =0;  // increment counter
+  byte counter_d=0; // counter direction
+  byte total_count = 20;  // total increments
+  msTimer timer_cal;    // calibration command timer
+  byte poscmdCal_oldVal =0;  // the last poscmd cal value
+  byte poscmdCal_currentVal =0;  // the current poscmd cal value
+  msTimer timer_reboot_port;    // reboot command timer - port
+  msTimer timer_reboot_starb;    // reboot command timer - starb
+  msTimer timer_button_movcmd;    // movement command button filter timer
+  byte button_pressed = 0;           // indicate button being pressed
+  
+   // position feedback
+  double posfed_gain = 0.0936;
+  double posfed_offset = -24.7101;
+  double posfed_port_a = 0;  // auto value
+  double posfed_starb_a = 0; // auto value
+  
+  // position command
+  double poscmd_gain = 0.0934;
+  double poscmd_offset = -24.6555;
+  double poscmd_port_a = 0; // auto value
+  double poscmd_starb_a = 0; // auto value
+  
+  // Pitch and Roll angle
+  double pr_gain = 200;
+  double pr_offset = 31995;
+  
+  // temp calculations
+  word word1;
+  word word2;
+  word word3;
+  float float1;
+  byte byte1;
+
+}
+
+// ***************************** Functions for forwarding messages***********************************
+// Function to extract pgn from ID
+word get_pgn(dword msg_id) {
+    // Masking to extract the LSB 2 bytes (16 bits)
+    msg_id = msg_id << 8;
+    msg_id = msg_id >> 16;
+    return (word) msg_id;
+}
+
+// Function to extract source address from ID
+byte get_src(dword msg_id) {
+    // Masking to extract the LSB 2 bytes (16 bits)
+    msg_id = msg_id << 24;
+    msg_id = msg_id >> 24;
+    return (byte) msg_id;
+}
+
+// Filter SW module msg - that is not changing and no effect from SW module
+byte not_fixMsg(dword msg_id)
+{
+  if(get_pgn(msg_id) != 0xFC9C 
+          && get_pgn(msg_id) != 0xFCA2 && get_pgn(msg_id) != 0xFCA5
+          && get_pgn(msg_id) != 0xFCA1 && get_pgn(msg_id) != 0xFCA4
+          && get_pgn(msg_id) != 0xFC98 && get_pgn(msg_id) != 0xFC99
+          && get_pgn(msg_id) != 0xFC9D && get_pgn(msg_id) != 0xFCC2
+          && get_pgn(msg_id) != 0xFC50 && get_pgn(msg_id) != 0xFC52
+          && get_pgn(msg_id) != 0xFC3F && get_pgn(msg_id) != 0xFC40
+          && get_pgn(msg_id) != 0xFC42 && get_pgn(msg_id) != 0xFC48
+          && get_pgn(msg_id) != 0xFC49 && get_pgn(msg_id) != 0xFC4A
+          && get_pgn(msg_id) != 0xFC4B && get_pgn(msg_id) != 0xFC4C
+          && get_pgn(msg_id) != 0xFC4E && get_pgn(msg_id) != 0xFCC1
+          && get_pgn(msg_id) != 0xFE14 && get_pgn(msg_id) != 0xFF46
+          && get_pgn(msg_id) != 0xFC3C)
+    return 1;
+  else
+    return 0;
+}
+
+// Filter SW module - that is no effect messages from SW module
+byte not_noEftMsg(dword msg_id)
+{
+  if(get_pgn(msg_id) != 0xFC33 && get_pgn(msg_id) != 0xFC34
+    && get_pgn(msg_id) != 0xFC35 && get_pgn(msg_id) != 0xFC36
+    && get_pgn(msg_id) != 0xFC38 && get_pgn(msg_id) != 0xFC3D
+    && get_pgn(msg_id) != 0xFC3E && get_pgn(msg_id) != 0xFC51
+    && get_pgn(msg_id) != 0xFC53 && get_pgn(msg_id) != 0xFC5A
+    && get_pgn(msg_id) != 0xFC5B && get_pgn(msg_id) != 0xFC5C
+    && get_pgn(msg_id) != 0xFC96 && get_pgn(msg_id) != 0xFC97
+    && get_pgn(msg_id) != 0xFCA0 && get_pgn(msg_id) != 0xFCC0
+    )
+    return 1;
+  else
+    return 0;
+}
+
+// Filter defined messages
+byte not_noDefMsg(dword msg_id)
+{
+  if(//get_pgn(msg_id) != 0x1002 && 
+    get_pgn(msg_id) != 0x1005 // authentication 
+    && get_pgn(msg_id) != 0x1120 && get_pgn(msg_id) != 0x100C // authentication 
+    && get_pgn(msg_id) != 0xFC32 && get_pgn(msg_id) != 0xFC37 // pitch and roll
+    && get_pgn(msg_id) != 0xFC66 && get_pgn(msg_id) != 0xFC4D // unknown
+    && get_pgn(msg_id) != 0xFC9A && get_pgn(msg_id) != 0xFC9B 
+    && get_pgn(msg_id) != 0xFC9E && get_pgn(msg_id) != 0xFC37 
+    )
+    return 1;
+  else
+    return 0;
+}
+
+ // assign J1939 message ID based on PGN, Src, priority
+ dword asgnMsgID(dword pgn, dword src, byte priority) // only consider priority 3,6 for all destination
+{
+  dword messageId;
+  if(priority == 3)
+  {
+    messageId = 0xC000000; // priority 3, all dest
+  }
+  
+  else if(priority == 6)
+  {
+    messageId = 0x18000000; // priority 6, all dest
+  }
+  
+  messageId = messageId | (pgn << 8);
+  messageId = messageId | src;
+  
+  return messageId;
+  
+}
+ 
+// ***************************** Functions for sending fake messages***********************************
+// send basic fake message
+ void sendFakeMsg(byte enable, dword pgn, dword src, byte priority, int channel, byte B0, byte B1, byte B2, byte B3, byte B4, byte B5, byte B6, byte B7 )
+{
+  message CAN1. *MyMsg1;
+  message CAN2. *MyMsg2;
+  dword messageId;
+  
+  if(enable != 0)
+  {
+    // Assign message J1939 ID
+    messageId = asgnMsgID(pgn, src, priority);
+      
+    // Set the message ID
+    MyMsg1.id = 0x0x;// convert to hex to be able to assign ID
+    MyMsg1.id = MyMsg1.id | messageId; //decimal - 217841676
+    MyMsg1.DataLength = 8;
+    
+    // Assign data
+    MyMsg1.byte(0) = B0;
+    MyMsg1.byte(1) = B1;
+    MyMsg1.byte(2) = B2;
+    MyMsg1.byte(3) = B3;
+    MyMsg1.byte(4) = B4;
+    MyMsg1.byte(5) = B5;
+    MyMsg1.byte(6) = B6;
+    MyMsg1.byte(7) = B7;
+
+    // Send the message on the specified CAN channel
+    if(channel == 1)
+    {
+      output(MyMsg1);
+    }
+    
+    else if (channel == 2) // current only for CAN1 or CAN2
+    {
+      MyMsg2 = MyMsg1;
+      output(MyMsg2);
+    }
+    
+  }
+  
+}
+
+// send basic fake message
+ void sendFakeMsg_ID(byte enable, dword messageId, int channel, byte B0, byte B1, byte B2, byte B3, byte B4, byte B5, byte B6, byte B7 )
+{
+  message CAN1. *MyMsg1;
+  message CAN2. *MyMsg2;
+  
+  if(enable != 0)
+  {
+    // Set the message ID
+    MyMsg1.id = 0x0x;// convert to hex to be able to assign ID
+    MyMsg1.id = MyMsg1.id | messageId; //decimal - 217841676
+    MyMsg1.DataLength = 8;
+    
+    // Assign data
+    MyMsg1.byte(0) = B0;
+    MyMsg1.byte(1) = B1;
+    MyMsg1.byte(2) = B2;
+    MyMsg1.byte(3) = B3;
+    MyMsg1.byte(4) = B4;
+    MyMsg1.byte(5) = B5;
+    MyMsg1.byte(6) = B6;
+    MyMsg1.byte(7) = B7;
+
+    // Send the message on the specified CAN channel
+    if(channel == 1)
+    {
+      output(MyMsg1);
+    }
+    
+    else if (channel == 2) // current only for CAN1 or CAN2
+    {
+      MyMsg2 = MyMsg1;
+      output(MyMsg2);
+    }
+    
+  }
+  
+}
+
+// Send fake position command
+void sendPosCmd()
+{
+  // byte data
+  byte B0, B1, B2, B3, B4, B5, B6, B7;
+  word poscmd_raw =0;  // raw data
+  double poscmd_port, poscmd_starb; // pos value
+  // initiate byte value
+  B0=0; B1=0; B2=0; B3=0; B4=0; B5=0; B6=0; B7=0;
+  // assign position value /deg
+  if(@fakeMsg::poscmd_changemode == 0) // assign manual value
+  {
+    if(button_pressed == 0) // perform button +/-
+    {
+      // up and down button check
+      if(@button::upcmd_port == 1)
+      {
+        if(@fakeMsg::poscmd_port_B3_bit0_B2>20)  // port up
+        {
+          @fakeMsg::poscmd_port_B3_bit0_B2 = 21;
+        }
+        else
+        {
+          @fakeMsg::poscmd_port_B3_bit0_B2 +=1;
+        }
+        
+        button_pressed = 1;  
+        setTimer(timer_button_movcmd, 300);
+        
+      }
+      
+      else if(@button::dwcmd_port == 1)          // port down
+      {
+        if(@fakeMsg::poscmd_port_B3_bit0_B2<1)
+        {
+          @fakeMsg::poscmd_port_B3_bit0_B2 = 0;
+        }
+        else
+        {
+          @fakeMsg::poscmd_port_B3_bit0_B2 -=1;
+        }
+        
+        button_pressed = 1;  
+        setTimer(timer_button_movcmd, 300);
+      }
+      
+      else if(@button::upcmd_starb == 1)       // starb up
+      {
+        if(@fakeMsg::poscmd_starb_B6_bit0_B5<-20)
+        {
+          @fakeMsg::poscmd_starb_B6_bit0_B5 = -21;
+        }
+        else
+        {
+          @fakeMsg::poscmd_starb_B6_bit0_B5 -=1;
+        }
+        
+        button_pressed = 1;  
+        setTimer(timer_button_movcmd, 300);
+      }
+      
+      else if(@button::dwcmd_starb == 1)    // starb down
+      {
+        if(@fakeMsg::poscmd_starb_B6_bit0_B5>-1)
+        {
+          @fakeMsg::poscmd_starb_B6_bit0_B5 = 0;
+        }
+        else
+        {
+          @fakeMsg::poscmd_starb_B6_bit0_B5 +=1;
+        }
+        
+        button_pressed = 1;  
+        setTimer(timer_button_movcmd, 300);
+      }
+      
+    }
+
+    poscmd_port = @fakeMsg::poscmd_port_B3_bit0_B2;
+    poscmd_starb = @fakeMsg::poscmd_starb_B6_bit0_B5;
+  }
+  else                                // assign auto value
+  {
+    poscmd_port =  poscmd_port_a;
+    poscmd_starb =  poscmd_starb_a;
+  }
+  
+  
+  // work mode and cal commmands
+  B0 = @fakeMsg::poscmd_workmode; // work mode
+  // send calibration command for 20ms
+  if(@fakeMsg::poscmd_cal != poscmdCal_oldVal)
+  {
+    poscmdCal_oldVal = @fakeMsg::poscmd_cal;
+    poscmdCal_currentVal = @fakeMsg::poscmd_cal;
+    setTimer(timer_cal, 20); // set cal command byte for 20ms and go back to 0
+    // send following reboot command after 6 seconds
+    if(poscmdCal_currentVal == 32)
+    {
+      setTimer(timer_reboot_port, 6000);
+    }
+    else if(poscmdCal_currentVal == 80)
+    {
+      setTimer(timer_reboot_starb, 6000);
+    }
+
+  }
+  B1 = poscmdCal_currentVal;
+  
+  // Position commands - port
+  // abs position, noise, pos reference
+  B3 = B3 | (((byte)(@fakeMsg::poscmd_portNoise_B3_bit4_7))<<4); // position noise - port, B3_bit4_7
+  B3 = B3 | ((((byte)(@fakeMsg::poscmd_port_abs_B3_bit1_3))<<1)&14); // abs position - port, B3_bit1_3
+  B4 = @fakeMsg::poscmd_reference_port_B4; // position reference: 112-98 for full travel
+  // precise position
+  poscmd_raw = (poscmd_port - poscmd_offset)/poscmd_gain;
+  // poscmd_raw -> B3_bit0 & B2
+  B2 = (byte) (poscmd_raw&0x00ff);  // B2
+  B3 = B3 | (((byte)(poscmd_raw>>8)) & 1); // B3_bit0
+ 
+  // Position commands - starboard
+  // abs position, noise, pos reference
+  B6 = B6 | (((byte)(@fakeMsg::poscmd_starbNoise_B6_bit4_7))<<4); // position noise - starb, B6_bit4_7
+  B6 = B6 | ((((byte)(@fakeMsg::poscmd_starb_abs_B6_bit1_3))<<1)&14); // abs position - starb, B6_bit1_3
+  B7 = @fakeMsg::poscmd_reference_starb_B7;// position reference: 112-98 for full travel
+  // precise position
+  poscmd_raw = (poscmd_starb - poscmd_offset)/poscmd_gain;
+  // poscmd_raw -> B6_bit0 & B5
+  B5 = (byte) (poscmd_raw&0x00ff);  // B5
+  B6 = B6 | (((byte)(poscmd_raw>>8)) & 1); // B6_bit0
+  
+  sendFakeMsg( @fakeMsg::poscmd_enable,64512, 12, 3, @fakeMsg::poscmd_channel, B0, B1, B2, B3, B4, B5, B6, B7 );
+}
+
+// Send fake pitch and roll angles
+
+// Send fake position feedback
+/*
+        // change posfed value
+        if(@panel::posfed_enable != 0)
+        {
+            if(get_pgn(this.id)== 64522)
+          {
+            if(@panel::change_mode == 0) // manual change mode
+            {
+              posfed_port = @panel::posfed_port;
+              posfed_starb = @panel::posfed_starb;
+            }
+            else // auto change mode
+            {
+              posfed_port = posfed_port_a;
+              posfed_starb = posfed_starb_a;
+            }
+            
+            if(get_src(this.id)== 2)  // port
+            {
+              posfed_raw = (posfed_port - posfed_offset)/posfed_gain;
+            }
+            if(get_src(this.id)== 5)  // starb
+            {
+              posfed_raw = (posfed_starb - posfed_offset)/posfed_gain;
+            }
+      
+            
+            // posfed_raw -> B3_bit0 & B2
+            this.byte(2) = (byte) (posfed_raw&0xff);  // B2
+            this.byte(3) = (this.byte(3)&0xFE) | ((posfed_raw&0x100)>>8); // B3_bit0
+            
+            
+          }
+          
+        }
+*/
+
+
+// Send fake work mode
+
+on start
+{
+  setTimer(timer_10ms, 10);
+}
+
+// *************************************** Timer setup**********************************************
+// Main loop
+on timer timer_10ms
+{
+  if(counter_d==0)            // Increment to 6000 (30deg)
+  {
+    counter++;
+    posfed_port_a = posfed_port_a + 1;
+    posfed_starb_a = posfed_starb_a - 1;
+    poscmd_port_a = poscmd_port_a + 1;
+    poscmd_starb_a = poscmd_starb_a - 1;
+  }
+  else
+  {
+    counter--;
+    posfed_port_a = posfed_port_a - 1;
+    posfed_starb_a = posfed_starb_a + 1;
+    poscmd_port_a = poscmd_port_a - 1;
+    poscmd_starb_a = poscmd_starb_a + 1;
+  }
+  
+  if(counter > total_count)            // Increment to 6000 (30deg)
+  {
+    counter_d = 1; // change to decrement
+  }
+  if(counter<1)
+  {
+    counter_d = 0; // change to increment
+  }
+    
+  
+  // ** Send fake messages**
+  // send poscmd
+    sendPosCmd();
+  // send message by byte
+    sendFakeMsg(@fakeMsg::msg0_enable, @fakeMsg::msg0_pgn, @fakeMsg::msg0_src, @fakeMsg::msg0_priority, @fakeMsg::msg0_channel, @fakeMsg::msg0_B0, @fakeMsg::msg0_B1, @fakeMsg::msg0_B2, @fakeMsg::msg0_B3, @fakeMsg::msg0_B4, @fakeMsg::msg0_B5, @fakeMsg::msg0_B6, @fakeMsg::msg0_B7 );
+  
+  setTimer(timer_10ms, 10); // Restart the timer for the next cycle
+}
+
+// Calibration command sending
+  on timer timer_cal
+  {
+    poscmdCal_currentVal = 0;
+  }
+  
+// Reboot command sending
+  on timer timer_reboot_port
+  {
+    sendFakeMsg_ID(1, 17826336, 2, 1, 1, 53, 17, 255, 255, 255, 255);
+  }
+// Reboot command sending
+  on timer timer_reboot_starb
+  {
+    sendFakeMsg_ID(1, 17827104, 2, 1, 1, 56, 32, 255, 255, 255, 255);
+  }
+  
+  // movement command button press filter
+  on timer timer_button_movcmd
+  {
+    button_pressed = 0; // button released
+  }
+  
+// Network setup: CAN1-controller, CAN2-actuators
+
+// ***********************************************************CAN1********************************************************************
+on message CAN1. *
+{
+    message CAN2.* m;
+   // *****************************Message plot ***********************************
+   // plot position feedback
+   if(get_pgn(this.id)== 64522)
+   {
+     // B3_bit0 & B2
+     word1 = this.byte(3);
+     word1 = (word1& 1)<<8;
+     word2 = this.byte(2);
+            
+     float1 = word1+word2;  
+     if(get_src(this.id)== 2)
+     {
+        // Output the value to a system variable
+        @CAN1::PosFed_port = posfed_gain*float1 + posfed_offset;
+     }
+     if(get_src(this.id)== 5)
+     {
+        // Output the value to a system variable
+        @CAN1::PosFed_starb = posfed_gain*float1 + posfed_offset;
+     }
+    }
+  
+    // plot position command
+    if(get_pgn(this.id)== 64512)
+    {
+      // B3_bit0 & B2  - poscmd port 
+       word1 = this.byte(3);
+       word1 = (word1&1)<<8;
+       word2 = this.byte(2);
+       float1 = word1 + word2;
+      
+       @CAN1::PosCmd_port = poscmd_gain*float1 + poscmd_offset;
+          
+       // B6_bit0 & B5 - poscmd starb 
+       word1 = this.byte(6);
+       word1 = (word1&1)<<8;
+       word2 = this.byte(5);
+       float1 = word1 + word2;
+
+       @CAN1::PosCmd_starb = poscmd_gain*float1 + poscmd_offset;
+     }
+        
+        
+    if(this.dir == rx)
+    {
+      if(this.can == 1)
+      {
+        // *****************************Message forward ***********************************
+        if(@MsgFwdBlk::CAN1_forward_enable !=0)
+        {
+            if(get_pgn(this.id)!= @MsgFwdBlk::bPGN_CAN1 /*&& not_noEftMsg(this.id) == 1 && not_fixMsg(this.id) == 1 && not_noDefMsg(this.id) == 1*/) //msg filter
+          {
+            m=this;
+            output(m);
+          }
+          
+        } 
+        
+      }
+    }
+}
+
+// ***********************************************************CAN2********************************************************************
+on message CAN2. *
+{
+    message CAN1.* m;
+    // *****************************Message plot ***********************************
+    // plot position feedback
+    if(get_pgn(this.id)== 64522)
+    {
+      // B3_bit0 & B2
+      word1 = this.byte(3);
+      word1 = (word1& 1)<<8;
+      word2 = this.byte(2);
+            
+      float1 = word1+word2;
+          
+      if(get_src(this.id)== 2)
+      {
+        // Output the value to a system variable
+        @CAN2::PosFed_port = posfed_gain*float1 + posfed_offset;
+      }
+      if(get_src(this.id)== 5)
+      {
+        // Output the value to a system variable
+        @CAN2::PosFed_starb = posfed_gain*float1 + posfed_offset;
+        @CAN2::PosFed_starb_panel = - @CAN2::PosFed_starb; // show the abs value in panel
+      }
+          
+    }
+        
+    // plot position command
+    if(get_pgn(this.id)== 64512)
+    {
+      // B3_bit0 & B2  - poscmd port 
+      word1 = this.byte(3);
+      word1 = (word1&1)<<8;
+      word2 = this.byte(2);
+            
+      float1 = word1 + word2;
+
+      @CAN2::PosCmd_port = poscmd_gain*float1 + poscmd_offset;
+          
+      // B6_bit0 & B5 - poscmd starb 
+      word1 = this.byte(6);
+      word1 = (word1&1)<<8;
+      word2 = this.byte(5);
+            
+      float1 = word1 + word2;
+
+      @CAN2::PosCmd_starb = poscmd_gain*float1 + poscmd_offset;
+          
+     }
+        
+      if(this.dir == rx)
+      {
+        if(this.can == 2)
+        {
+          // *****************************Message forward ***********************************
+          if(@MsgFwdBlk::CAN2_forward_enable !=0)
+          {
+            if(get_pgn(this.id)!= @MsgFwdBlk::bPGN_CAN2 )  // block messages
+            {
+              m=this;
+              output(m);
+            }
+            
+          }
+          
+        }
+      }
+}
+
+

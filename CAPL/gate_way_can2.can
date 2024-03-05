@@ -1,0 +1,29 @@
+/*@!Encoding:1252*/
+includes
+{
+  
+}
+
+variables
+{
+  
+}
+
+// Network setup: CAN1-controller, CAN2-actuators
+// forward CAN2 message to CAN1
+on message CAN2. *
+{
+    message CAN1.* m;
+      if(this.dir == rx)
+      {
+        if(this.can == 2)
+        {
+          m=this;
+          output(m);
+        }
+        
+      }
+    
+}
+
+

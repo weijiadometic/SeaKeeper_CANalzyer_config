@@ -1,0 +1,34 @@
+/*@!Encoding:1252*/
+includes
+{
+  
+}
+
+variables
+{
+  
+}
+
+// This is an example to create gate_way that only forward certain pgn messages from CAN2 to CAN3
+// It is meant to investigate which message is necessary for Seakeeper ride to detect a GPS sensor, and finally the 2 messages were made by IG block after the investigation.
+
+on message CAN2. *
+{
+    message CAN3.* m;
+    
+    if(this.DIR==RX)
+    {
+      if(this.can == 2)
+      {
+        // only puplulate pgn129026 and pgn129029 to CAN3, which is fake GPS sensor message that Seakeeper ride needs to work in automatic mode.
+        if(this.id == 167248400x || this.id == 234358032x) 
+        {
+          m=this;
+          output(m);
+        }
+        
+      }
+    }
+    
+}
+

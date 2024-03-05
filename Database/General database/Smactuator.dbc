@@ -1,0 +1,98 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_:
+VAL_TABLE_ SteeringStateFbk 5 "Paddle Mode" 4 "Fail" 3 "Inspect" 2 "Purge" 1 "Calibration" 0 "Normal" ;
+VAL_TABLE_ CalStatus 7 "N/A" 4 "Freeze" 3 "Reserved" 2 "Stbd Cal" 1 "Port Cal" 0 "Move" ;
+VAL_TABLE_ SteeringStateRqst 12 "Center Cylinders" 5 "Fail" 4 "Inspect" 3 "Purge Stbd" 2 "Purge Port" 1 "Calibrate" 0 "Normal" ;
+
+
+BO_ 3221225472 VECTOR__INDEPENDENT_SIG_MSG: 0 Vector__XXX
+ SG_ New_Signal_16 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_15 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_14 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_13 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_12 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_11 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_10 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ New_Signal_9 : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+ SG_ TT_Vel : 0|16@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 2680225590 TT_Diag3_PID2: 8 Vector__XXX
+ SG_ TT_DutyFinal_ToHBridge : 23|16@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ TT_zPID_dErr : 39|16@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ TT_zPID_pErr : 7|16@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ TT_zPID_iErr : 55|16@0- (0.01,0) [0|0] "" Vector__XXX
+
+BO_ 2680225593 TT_Diag1: 8 Vector__XXX
+ SG_ TT_CtrlrCmdPos : 23|16@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ TT_PMFFIF : 63|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ TT_GDUVhd : 7|16@0- (0.1,0) [0|65535] "v" Vector__XXX
+ SG_ TT_GDUSTAT : 55|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ TT_GDUF : 47|8@0+ (1,0) [0|255] "" Vector__XXX
+ SG_ TT_GDUDSE : 39|8@0+ (1,0) [0|255] "" Vector__XXX
+
+BO_ 2680225591 TT_Diag0: 8 Vector__XXX
+ SG_ TT_Isquared_5sec : 7|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ TT_Isquared_1min : 23|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ TT_ActuatorDuty : 55|16@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ TT_Isquared_5min : 39|16@0- (1,0) [0|0] "" Vector__XXX
+
+BO_ 2680225594 TT_Diag2: 8 Vector__XXX
+ SG_ TT_motorState : 55|16@0- (1,0) [0|0] "" Vector__XXX
+ SG_ TT_HD_CrossCoupling_Duty : 39|16@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ TT_SetpointVel : 23|16@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ TT_SetpointPos : 7|16@0- (0.01,0) [0|0] "" Vector__XXX
+
+BO_ 2680225592 TT_SystemStatus: 8 Vector__XXX
+ SG_ TT_MCUTemperature : 55|16@0- (0.1,0) [0|0] "" Vector__XXX
+ SG_ TT_MotorCurrent : 39|16@0- (0.1,0) [0|0] "" Vector__XXX
+ SG_ TT_BatteryVoltage : 23|16@0- (0.001,0) [0|0] "" Vector__XXX
+ SG_ TT_Pos : 7|16@0- (0.01,0) [0|0] "" Vector__XXX
+
+BO_ 2680225595 TT_Diag3_PID: 8 Vector__XXX
+ SG_ TT_pTerm : 23|16@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ TT_pErr : 7|16@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ TT_iTerm : 39|16@0- (0.01,0) [0|0] "" Vector__XXX
+ SG_ TT_dTerm : 55|16@0- (0.01,0) [0|0] "" Vector__XXX
+
+
+
+CM_ BO_ 3221225472 "This is a message for not used signals, created by Vector CANdb++ DBC OLE DB Provider.";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_  "IsNMEA" INT 0 1;
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "IsNMEA" 1;
+

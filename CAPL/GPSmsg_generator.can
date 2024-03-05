@@ -1,0 +1,53 @@
+/*@!Encoding:1252*/
+// The script is meant to periodically transmit fake GPS messages (COGAndSOG and GNNSPos) on Nmea 2K(CAN3) to enable seakeeper ride system automatic mode, please insert a virtual node on CAN3 and apply the CAN file.
+// ToDo: The script can only successfully transmit COGAndSOG but failed to transmit GNNSPos with expected 51 data length.
+includes
+{
+  
+}
+
+variables
+{
+  msTimer ms_10;
+  message COGAndSOGRapideUpdate COGAndSOG;
+  message GNNSPositionData GNNSPos;
+  
+  
+}
+
+
+on start
+{
+  // COG and SOG definition
+  COGAndSOG.id = 0x9F80210x; // priority 2, DP 1, PDU format 0xf8, PDU specific 2(des address 0xff), source address 0x10, PGN 0x1F802 
+  COGAndSOG.can = 3;
+  COGAndSOG.dir = 1;
+  // Message values
+  COGAndSOG.SID = 1;
+  COGAndSOG.CourseOverGround = 369; // 5 deg
+  COGAndSOG.SpeedOverGround = 202; // 10 knots
+  COGAndSOG.COGReference = 3; // 10 knots
+  
+  // GNNS position definition
+  GNNSPos.id = 0xDF80510x; // priority 3, DP 1, PDU format 0xf8, PDU specific 5(des address 0xff), source address 0x10, PGN 0x1F805 
+  GNNSPos.can = 3;
+  GNNSPos.dir = 1;
+  // Message values
+  GNNSPos.DataLength = 51;
+  GNNSPos.simulated =1;
+}
+
+on key 'a'  // Please press 'a' on the keyboard to start the transimit
+{
+  setTimer(ms_10,10);
+}
+
+
+
+on timer ms_10
+{
+  output(COGAndSOG);
+  output(GNNSPos);
+  setTimer(ms_10,10); // transmit every 10 ms.
+}
+
